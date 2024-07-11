@@ -8,18 +8,22 @@ public class PlayerCtrl : MonoBehaviour
 {
     [HideInInspector] public PlayerState CurState = PlayerState.Idle;
 
+    CharacterController charCtrl = null;
     Animator anim = null;
 
-    Rigidbody rigid = null;
     float inputH = 0.0f;
     float inputV = 0.0f;
     Vector3 moveDir = Vector3.zero;
     float moveSpeed = 3.0f;
     float rotSpeed = 10.0f;
 
+    public GameObject Ball = null;
+    public Transform LeftHandPos = null;
+    public Transform RightHandPos = null;
+
     void Awake()
     {
-        rigid = GetComponent<Rigidbody>();
+        charCtrl = GetComponent<CharacterController>();
         anim = GetComponentInChildren<Animator>();
     }
 
@@ -28,14 +32,27 @@ public class PlayerCtrl : MonoBehaviour
 
     }
 
-    void FixedUpdate()
-    {
-        Move();
-    }
+    //void FixedUpdate() { //Move(); }
 
     void Update()
     {
+        Move();
+
         SetCurState();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Ball.transform.parent = RightHandPos;
+            Ball.transform.localPosition = Vector3.zero;
+            Ball.transform.localRotation = Quaternion.identity;
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            Ball.transform.parent = null;
+            Rigidbody rb = Ball.GetComponentInChildren<Rigidbody>();
+            rb.AddForce(transform.forward * 500);
+        }
     }
 
     void SetCurState()
@@ -80,13 +97,12 @@ public class PlayerCtrl : MonoBehaviour
         moveDir.z = inputV;
         moveDir.Normalize();
 
-        Vector3 pos = transform.position + moveDir * moveSpeed * Time.fixedDeltaTime;
-        rigid.MovePosition(pos);
+        charCtrl.SimpleMove(moveDir * moveSpeed);
 
         if (moveDir != Vector3.zero)
         {
-            Quaternion target = Quaternion.Slerp(rigid.rotation, Quaternion.LookRotation(moveDir), rotSpeed * Time.fixedDeltaTime);
-            rigid.MoveRotation(target);
+            transform.rotation = Quaternion.Slerp(transform.rotation,
+                Quaternion.LookRotation(moveDir), rotSpeed * Time.deltaTime);
         }
     }
 }
