@@ -372,7 +372,7 @@ PrefabInstance:
     - target: {fileID: 2451523149383428593, guid: 9f0b5713b7412ab4eb37110128bbc164,
         type: 3}
       propertyPath: m_ApplyRootMotion
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8423318466619552651, guid: 9f0b5713b7412ab4eb37110128bbc164,
         type: 3}
@@ -488,8 +488,8 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 674110210}
   serializedVersion: 4
-  m_Mass: 10
-  m_Drag: 0
+  m_Mass: 1
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -519,6 +519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6a1627d214f3f64da84ea8d21bbdd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CurState: 0
 --- !u!136 &674110214
 CapsuleCollider:
   m_ObjectHideFlags: 0
