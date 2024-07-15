@@ -22,6 +22,8 @@ public class TargetTest : MonoBehaviour
             dir = Target.position - ball.transform.position;
             dir.Normalize();
 
+            ball.transform.parent = null;
+            ball.Rigid.useGravity = true;
             ballRigid.AddForce(dir * 1000);
         }
     }
