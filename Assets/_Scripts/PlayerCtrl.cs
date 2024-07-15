@@ -46,9 +46,9 @@ public class PlayerCtrl : MonoBehaviour
             Ball.transform.localPosition = Vector3.zero;
             Ball.transform.localRotation = Quaternion.identity;
 
-            Ball.SpColl.isTrigger = true;
             Ball.Rigid.useGravity = false;
             Ball.Rigid.velocity = Vector3.zero;
+            Ball.Rigid.angularVelocity = Vector3.zero;
         }
 
         if (Input.GetKeyDown(KeyCode.T))
@@ -57,7 +57,6 @@ public class PlayerCtrl : MonoBehaviour
             Rigidbody rb = Ball.GetComponentInChildren<Rigidbody>();
             rb.AddForce(transform.forward * 500);
 
-            Ball.SpColl.isTrigger = false;
             Ball.Rigid.useGravity = true;
         }
     }
