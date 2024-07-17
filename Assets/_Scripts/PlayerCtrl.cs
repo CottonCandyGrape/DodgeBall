@@ -11,11 +11,15 @@ public class PlayerCtrl : MonoBehaviour
     CharacterController charCtrl = null;
     Animator anim = null;
 
+    //이동관련
     float inputH = 0.0f;
     float inputV = 0.0f;
     Vector3 moveDir = Vector3.zero;
-    float moveSpeed = 3.0f;
+    float moveSpeed = 0.0f;
+    float walkSpeed = 1.5f;
+    float runSpeed = 4.0f;
     float rotSpeed = 10.0f;
+    //이동관련
 
     public BallCtrl Ball = null;
     public Transform LeftHandPos = null;
@@ -61,10 +65,10 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        Debug.Log(hit.gameObject.name); 
-    }
+    //void OnControllerColliderHit(ControllerColliderHit hit)
+    //{
+    //    Debug.Log(hit.gameObject.name); 
+    //}
 
     void SetCurState()
     {
@@ -74,8 +78,9 @@ public class PlayerCtrl : MonoBehaviour
             {
                 CurState = PlayerState.Walk;
 
-                anim.SetBool("Idle", false); //자기상태 먼저 끄고
-                anim.SetBool("Walk", true); //다음상태 켜기
+                moveSpeed = walkSpeed;
+
+                ChangeAnimState(PlayerState.Walk);
             }
         }
         else if (CurState == PlayerState.Walk)
@@ -86,16 +91,30 @@ public class PlayerCtrl : MonoBehaviour
                 inputH = 0.0f; inputV = 0.0f;
                 CurState = PlayerState.Idle;
 
-                anim.SetBool("Walk", false);
-                anim.SetBool("Idle", true);
+                moveSpeed = 0.0f;
+
+                ChangeAnimState(PlayerState.Idle);
             }
         }
-        //else if (CurState == PlayerState.Run)
-        //{ }
+        else if (CurState == PlayerState.Run)
+        {
+
+        }
         //else if (CurState == PlayerState.Jump)
         //{ }
         //else if (CurState == PlayerState.Loose)
         //{ }
+    }
+
+    void ChangeAnimState(PlayerState pState)
+    {
+        for (int i = 0; i < anim.parameterCount; i++)
+        {
+            if (pState.ToString() == anim.parameters[i].name)
+                anim.SetBool(anim.parameters[i].name, true);
+            else
+                anim.SetBool(anim.parameters[i].name, false);
+        }
     }
 
     void Move()
