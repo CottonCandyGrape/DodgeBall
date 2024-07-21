@@ -23,10 +23,8 @@ public class PlayerCtrl : MonoBehaviour
     float rotSpeed = 10.0f;
     //이동관련
 
-    bool readyRun = false;
-    bool isRun = false;
-    float runTimer = 0.5f;
-    float runTime = 0.5f;
+    float runTapLimit = 0.5f;
+    float lastTapTime = -1.0f;
     KeyCode dirKey = KeyCode.None;
 
     public BallCtrl Ball = null;
@@ -39,16 +37,15 @@ public class PlayerCtrl : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
     }
 
-    void Start()
-    {
-
-    }
+    //void Start() { }
 
     void Update()
     {
+        Move();
+
         SetCurState();
 
-        Move();
+        CheckRunTap();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -82,47 +79,42 @@ public class PlayerCtrl : MonoBehaviour
         {
             if (inputH != 0.0f || inputV != 0.0f)
             {
-                moveSpeed = walkSpeed;
+                dirKey = GetCurKeyDown();
 
+                moveSpeed = walkSpeed;
                 CurState = PlayerState.Walk;
                 ChangeAnimParam(PlayerState.Walk);
-                return;
             }
-
-            ReadyRun();
         }
         else if (CurState == PlayerState.Walk)
         {
             if ((-0.01f <= inputH && inputH <= 0.01f) &&
                (-0.01f <= inputV && inputV <= 0.01f))
             {
-                inputH = 0.0f; inputV = 0.0f;
-
-                moveSpeed = 0.0f;
-
-                CurState = PlayerState.Idle;
-                ChangeAnimParam(PlayerState.Idle);
+                ToIdleState();
             }
         }
         else if (CurState == PlayerState.Run)
         {
-            Debug.Log("run이다");
-            if(Input.GetKeyUp(dirKey))
+            if ((-0.01f <= inputH && inputH <= 0.01f) &&
+               (-0.01f <= inputV && inputV <= 0.01f))
             {
-                isRun = false;
-
-                runTimer = runTime;
-                moveSpeed = 0.0f;
-                dirKey = KeyCode.None;
-
-                CurState = PlayerState.Idle;
-                ChangeAnimParam(PlayerState.Idle);
+                ToIdleState();
             }
         }
         //else if (CurState == PlayerState.Jump)
         //{ }
         //else if (CurState == PlayerState.Loose)
         //{ }
+    }
+
+    void ToIdleState()
+    {
+        inputH = 0.0f; inputV = 0.0f;
+
+        moveSpeed = 0.0f;
+        CurState = PlayerState.Idle;
+        ChangeAnimParam(PlayerState.Idle);
     }
 
     void ChangeAnimParam(PlayerState pState)
@@ -136,34 +128,18 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-    void ReadyRun()
+    void CheckRunTap()
     {
-        if (dirKey == KeyCode.None) return;
-
-        runTimer -= Time.deltaTime;
-        if (runTimer < 0.0f)
+        if (Input.GetKeyDown(dirKey))
         {
-            runTimer = runTime;
-            return;
-        }
+            if (lastTapTime != -1.0f && (Time.time - lastTapTime) <= runTapLimit)
+            {
+                moveSpeed = runSpeed;
+                CurState = PlayerState.Run;
+                ChangeAnimParam(PlayerState.Run);
+            }
 
-        KeyCode curKey = GetCurKeyDown();
-        Debug.Log("down curkey : " + curKey.ToString());
-
-        if (curKey == KeyCode.None) return;
-
-        if (curKey == dirKey)
-        {
-            Debug.Log("같다");
-            isRun = true;
-            moveSpeed = runSpeed;
-
-            CurState = PlayerState.Run;
-            ChangeAnimParam(PlayerState.Run);
-        }
-        else
-        {
-            dirKey = curKey;
+            lastTapTime = Time.time;
         }
     }
 
@@ -171,15 +147,6 @@ public class PlayerCtrl : MonoBehaviour
     {
         inputH = Input.GetAxisRaw("Horizontal");
         inputV = Input.GetAxisRaw("Vertical");
-
-        //if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
-        //    && !readyRun)
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D))
-        {
-            dirKey = 0.0f < inputH ? KeyCode.D : KeyCode.A;
-            Debug.Log("dirkey : " + dirKey.ToString());
-            //readyRun = true;
-        }
 
         moveDir.x = inputH;
         moveDir.y = 0.0f;
